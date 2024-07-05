@@ -1,0 +1,71 @@
+{
+    "name": "Central Idea",
+    "children": [
+        {
+            "name": "Security Architecture",
+            "children": [
+                { 
+                    "name": "Network Security",
+                    "children": [
+                        { "name": "Virtual Network Security" },
+                        { "name": "Firewalls and \n Network Security Appliances" }
+                    ]
+                },
+                { 
+                    "name": "Access Control",
+                    "children": [
+                        { "name": "MFA & SSO" },
+                        { "name": "Identity Management" }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Security Operations",
+            "children": [
+                { 
+                    "name": "Threat Intelligence",
+                    "children": [
+                        { "name": "Detail 2.1.1" },
+                        { "name": "Detail 2.1.2" }
+                    ]
+                },
+                { 
+                    "name": "Incident Management",
+                    "children": [
+                        { "name": "Detail 2.2.1" },
+                        { "name": "Detail 2.2.2" }
+                    ]
+                },
+                { 
+                    "name": "Malware Analysis",
+                    "children": [
+                        { "name": "Detail 2.2.1" },
+                        { "name": "Detail 2.2.2" }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Information Security",
+            "children": [
+                {
+                    "name": "Standards",
+                    "children": [
+                        { "name": "ISO 27000 Series" },
+                        { "name": "NIST" },
+                        { "name": "BSI Grundschutz" }
+                    ]
+                },
+                {
+                    "name": "Risk Assessment",
+                    "children": [
+                        { "name": "ISO 27000 Series" },
+                        { "name": "NIST" },
+                        { "name": "BSI Grundschutz" }
+                    ]
+                }
+            ]
+        }
+    ]
+}
