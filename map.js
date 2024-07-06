@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Load data and initialize the graph
     d3.json("data.json").then(data => {
-        globData=data;
+        globData=Object.assign({},data);
         root = d3.hierarchy(data); // Create a hierarchy from the data
         assignColorsAndSizes(root); // Assign colors and sizes to the nodes
         assignNodeColors(root); // Assign colors to the nodes

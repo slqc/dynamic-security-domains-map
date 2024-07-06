@@ -11,14 +11,16 @@
                         { "name": "Virtual Network Security",
                         "description": "description placeholder" },
                         { "name": "Firewalls and \n Network Security Appliances",
-                        "description": "description placeholder", }
+                        "description": "description placeholder" }
                     ]
                 },
                 { 
                     "name": "Access Control",
                     "children": [
-                        { "name": "MFA & SSO" },
-                        { "name": "Identity Management" }
+                        { "name": "MFA & SSO",
+                        "description": "description placeholder" },
+                        { "name": "Identity Management",
+                        "description": "description placeholder" }
                     ]
                 }
             ]
