@@ -1,3 +1,5 @@
+var globData;
+
 document.addEventListener("DOMContentLoaded", function() {
     // Select the SVG element and get its dimensions
     const svg = d3.select("svg"),
@@ -18,6 +20,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const g = svg.append("g"); // Append group element to the SVG
     svg.call(zoom); // Apply zoom behavior to the SVG
 
+    const tooltip = d3.select("#tooltip"); // Select the tooltip element
+
     let root; // Variable to store the hierarchical data
 
     // Initialize the force simulation
@@ -29,6 +33,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Load data and initialize the graph
     d3.json("data.json").then(data => {
+        globData=data;
         root = d3.hierarchy(data); // Create a hierarchy from the data
         assignColorsAndSizes(root); // Assign colors and sizes to the nodes
         assignNodeColors(root); // Assign colors to the nodes
@@ -78,7 +83,10 @@ document.addEventListener("DOMContentLoaded", function() {
             .call(d3.drag() // Add drag behavior to nodes
                 .on("start", dragstarted)
                 .on("drag", dragged)
-                .on("end", dragended));
+                .on("end", dragended))
+            .on("mouseover", mouseovered) // Add mouseover event
+            .on("mouseout", mouseouted) // Add mouseout event
+            .on("click", clicked); // Add click event
 
         nodeEnter.append("rect") // Append rectangle for each node
             .attr("width", d => d.width) // Set width of rectangle
@@ -277,9 +285,8 @@ document.addEventListener("DOMContentLoaded", function() {
             // Calculate center and scale to fit the graph in the view
             const centerX = (bounds.maxX + bounds.minX) / 2;
             const centerY = (bounds.maxY + bounds.minY) / 2;
-            const scale = Math.max(0.1, Math.min(8, 0.6 / Math.max((bounds.maxX - bounds.minX) / width, (bounds.maxY - bounds.minY) / height)));
+            const scale = Math.max(0.1, Math.min(8, 0.9 / Math.max((bounds.maxX - bounds.minX) / width, (bounds.maxY - bounds.minY) / height)));
             const translate = [width / 2 - scale * centerX, height / 2 - scale * centerY];
-            console.log("Scale", scale);
 
             // Apply transition to the SVG for smooth zooming
             svg.transition()
@@ -298,5 +305,25 @@ document.addEventListener("DOMContentLoaded", function() {
             maxY = Math.max(maxY, d.y + d.radius); // Update maxY
         });
         return { minX, minY, maxX, maxY }; // Return bounding box
+    }
+
+    // Show tooltip with node description on mouseover
+    function mouseovered(event, d) {
+        tooltip.style("visibility", "visible")
+            .text(d.data.description);
+    }
+
+    // Hide tooltip on mouseout
+    function mouseouted() {
+        tooltip.style("visibility", "hidden");
+    }
+
+    // Show tooltip with node description on click
+    function clicked(event, d) {
+        console.log(d.data.description)
+        tooltip.style("visibility", "visible")
+            .text(d.data.description)
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY + 10) + "px");
     }
 });

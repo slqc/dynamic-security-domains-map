@@ -1,5 +1,6 @@
 {
-    "name": "Central Idea",
+    "name": "Cyber Security Domains",
+    "description": "description placeholder",
     "children": [
         {
             "name": "Security Architecture",
@@ -7,8 +8,10 @@
                 { 
                     "name": "Network Security",
                     "children": [
-                        { "name": "Virtual Network Security" },
-                        { "name": "Firewalls and \n Network Security Appliances" }
+                        { "name": "Virtual Network Security",
+                        "description": "description placeholder" },
+                        { "name": "Firewalls and \n Network Security Appliances",
+                        "description": "description placeholder", }
                     ]
                 },
                 { 
