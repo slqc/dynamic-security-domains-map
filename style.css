@@ -1,0 +1,40 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f4f4f4;
+}
+
+.container {
+    text-align: center;
+}
+
+button {
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+svg {
+    width: 100vw;
+    height: 80vh;
+    border: 1px solid #ccc;
+    background: white;
+}
+
+.node rect {
+    fill: lightblue;
+    stroke: steelblue;
+    rx: 10;
+    ry: 10;
+}
+
+text {
+    font-size: 14px;
+    text-anchor: middle;
+    pointer-events: none;
+}

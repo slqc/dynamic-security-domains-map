@@ -3,50 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Mind Map</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            overflow: hidden;
-            background-color: white;
-        }
-        #content {
-            text-align: center;
-            margin: 20px;
-        }
-        svg {
-            display: block;
-            margin: 0 auto;
-            border: 1px solid #ccc;
-        }
-        #buttons {
-            margin-bottom: 10px;
-        }
-        .tooltip {
-            position: absolute;
-            padding: 8px;
-            background: rgba(0, 0, 0, 0.75);
-            color: #fff;
-            border-radius: 4px;
-            pointer-events: none;
-            visibility: hidden;
-        }
-    </style>
+    <title>Security Domain Map</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="lib/d3.v7.min.js"></script>
 </head>
 <body>
-    <div id="content">
-        <h1>Dynamic Mind Map</h1>
-        <p>Use the buttons below to interact with the mind map.</p>
-        <div id="buttons">
-            <button id="reset_view">Reset View</button>
-        </div>
-        <svg id="mindmap" width="100%" height="600"></svg>
-        <div class="tooltip" id="tooltip"></div>
+    <div class="container">
+        <button id="reset">Reset Graph</button>
+        <svg id="graph"></svg>
     </div>
-    <!--<script src="https://d3js.org/d3.v7.min.js"></script>-->
-    <script src="lib/d3.v7.min.js"></script>
     <script src="map.js"></script>
 </body>
 </html>
-

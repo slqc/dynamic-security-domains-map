@@ -1,0 +1,247 @@
+{
+    "name": "Cyber Security Domains",
+    "children": [
+        {
+            "name": "Cyber Security Engineering",
+            "description": "tools and principles to secure IT and OT systems",
+            "children": [
+                {
+                    "name": "Network Security",
+                    "description": "tools and principles to design secure netorks",
+                    "children": [
+                        {
+                            "name": "Virtual Network Security",
+                            "description": "placeholder"
+                        },
+                        {
+                            "name": "WAN Security",
+                            "description": "specialized knowledge how to secure wide area networks, e.g. routing & secure DNS"
+                        },
+                        {
+                            "name": "Firewalls and \\n Network Security Appliances",
+                            "description": "Setup and secure configuration of firewalls and other network security appliances"
+                        }
+                    ]
+                },
+                {
+                    "name": "Access Control",
+                    "description": "placeholder",
+                    "children": [
+                        {
+                            "name": "MFA",
+                            "description": "Applying Multi-Factor authentifation to improve security"
+                        },
+                        {
+                            "name": "SSO",
+                            "description": "Use of single-sign-on to allow authenticated users to use a broad range of services"
+                        },
+                        {
+                            "name": "Identity Management",
+                            "description": "managing identities and roles in a singular or distributed system"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Secure Operations",
+            "description": "placeholder",
+            "children": [
+                {
+                    "name": "Logging & Log Analysis",
+                    "description": "placeholder",
+                    "children": [
+                        {
+                            "name": "SIEM",
+                            "description": "placeholder"
+                        },
+                        {
+                            "name": "Windows Event Logs",
+                            "description": "placeholder"
+                        },
+                        {
+                            "name": "Linux logs",
+                            "description": "placeholder"
+                        },
+                        {
+                            "name": "Incident detection",
+                            "description": "placeholder"
+                        }
+                    ]
+                },
+                {
+                    "name": "Incident Management",
+                    "description": "placeholder",
+                    "children": [
+                        {
+                            "name": "Detection"
+                        },
+                        {
+                            "name": "Containment"
+                        },
+                        {
+                            "name": "Investigation"
+                        },
+                        {
+                            "name": "Forensics"
+                        }
+                    ]
+                },
+                {
+                    "name": "Patch & vulnerability management"
+                }
+            ]
+        },
+        {
+            "name": "User Education",
+            "description": "placeholder",
+            "children": [
+                {
+                    "name": "Awareness"
+                },
+                {
+                    "name": "Table-top"
+                },
+                {
+                    "name": "Blue/Red Team exercises"
+                }
+            ]
+        },
+        {
+            "name": "Governance",
+            "description": "",
+            "children": [
+                {
+                    "name": "Laws and Regulation",
+                    "description": "",
+                    "children": [
+                        {
+                            "name": "Industry specific"
+                        },
+                        {
+                            "name": "International"
+                        },
+                        {
+                            "name": "National"
+                        }
+                    ]
+                },
+                {
+                    "name": "Management obligations",
+                    "description": "",
+                    "children": [
+                        {
+                            "name": "Risks Informed"
+                        },
+                        {
+                            "name": "Reports and Scorecards"
+                        },
+                        {
+                            "name": "KPI"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Information Security Management",
+            "description": "",
+            "children": [
+                {
+                    "name": "Frameworks",
+                    "description": "",
+                    "children": [
+                        {
+                            "name": "ISO 27001"
+                        },
+                        {
+                            "name": "BSI Grundschutz"
+                        },
+                        {
+                            "name": "NIST Cybersecurity Framework"
+                        }
+                    ]
+                },
+                {
+                    "name": "Information Security Management System",
+                    "description": "",
+                    "children": [
+                        {
+                            "name": "Policy"
+                        },
+                        {
+                            "name": "Procedures"
+                        },
+                        {
+                            "name": "Guidelines"
+                        },
+                        {
+                            "name": "Compliance & Enforcement"
+                        }
+                    ]
+                },
+                {
+                    "name": "Internal Audits"
+                },
+                {
+                    "name": "Certification Process"
+                }
+            ]
+        },
+        {
+            "name": "Vulnerability Management",
+            "description": "",
+            "children": [
+                {
+                    "name": "Penetration test",
+                    "description": "",
+                    "children": [
+                        {
+                            "name": "Infrastructure/Networks"
+                        },
+                        {
+                            "name": "Applications"
+                        },
+                        {
+                            "name": "Social Engineering"
+                        }
+                    ]
+                },
+                {
+                    "name": "Vulnerability Scans"
+                },
+                {
+                    "name": "Assessment/Supervision",
+                    "description": "",
+                    "children": [
+                        {
+                            "name": "Analysis of vulnerability scan results"
+                        },
+                        {
+                            "name": "Supervision of penetration tests"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Enterprise Risk Management",
+            "description": "",
+            "children": [
+                {
+                    "name": "Cyber Insurance",
+                    "description": ""
+                },
+                {
+                    "name": "Business Continuity Management"
+                },
+                {
+                    "name": "Crisis Management"
+                },
+                {
+                    "name": "Risk Register"
+                }
+            ]
+        }
+    ]
+}

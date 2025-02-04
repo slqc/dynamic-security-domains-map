@@ -1,0 +1,46 @@
+name: Cyber Security Domains
+children:
+  - name: Cyber Security Engineering
+    description: tools and principles to secure IT and OT systems
+    children:
+    - name: Network Security
+      description: tools and principles to design secure netorks
+      children:
+      - name: Virtual Network Security
+        description: placeholder 
+      - name: WAN Security
+        description: specialized knowledge how to secure wide area networks, e.g. routing & secure DNS
+      - name: Firewalls and \n Network Security Appliances
+        description: Setup and secure configuration of firewalls and other network security appliances
+    - name: Access Control
+      description: placeholder
+      children:
+      - name: MFA
+        description: Applying Multi-Factor authentifation to improve security
+      - name: SSO
+        description: Use of single-sign-on to allow authenticated users to use a broad range of services
+      - name: Identity Management
+        description: managing identities and roles in a singular or distributed system
+  - name: Secure Operations
+    description: placeholder  
+    children:
+    - name: Logging & Log Analysis
+      description: placeholder
+      children:
+        - name: SIEM
+          description: placeholder
+        - name: Windows Event Logs
+          description: placeholder
+        - name: Linux logs
+          description: placeholder
+        - name: Incident detection
+          description: placeholder
+    - name: Incident Management
+      description: placeholder
+      children: 
+        - name: Detection
+        - name: Containment
+        - name: Investigation
+        - name: Forensics
+    - name: Patch & vulnerability management
+  - name: Governance
