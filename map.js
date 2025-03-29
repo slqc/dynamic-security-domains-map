@@ -1,21 +1,3 @@
-const controls = d3.select("body").append("div").attr("id", "controls");
-
-controls.append("label").text("Force Strength: ");
-controls.append("input")
-    .attr("type", "range")
-    .attr("min", -500)
-    .attr("max", 0)
-    .attr("value", -300)
-    .attr("id", "forceStrength");
-
-controls.append("label").text(" Link Distance: ");
-controls.append("input")
-    .attr("type", "range")
-    .attr("min", 50)
-    .attr("max", 300)
-    .attr("value", 150)
-    .attr("id", "linkDistance");
-
 const width = window.innerWidth;
 const height = window.innerHeight * 0.8;
 const NODE_MAX_LINE_LENGTH = 20;
@@ -36,7 +18,7 @@ const g = svg.append("g"); // Create a group for the graph elements
 // Initialize the force simulation
 const simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(d => d.id).distance(100)) // Define link distance
-    .force("charge", d3.forceManyBody().strength(-500)) // Repel nodes from each other
+    .force("charge", d3.forceManyBody().strength(-50)) // Repel nodes from each other
     .force("center", d3.forceCenter(width / 2, height / 2)); // Center the graph
     //.force("collision", d3.forceCollide().radius(d => d.width / 2 ).iterations(1))
 
@@ -127,22 +109,6 @@ function loadGraph() {
             }
         });
 
-        /*
-        // Apply force simulation to nodes and links
-        simulation.nodes(nodes).on("tick", ticked);
-        simulation.force("link").links(links);
-
-        // Function to update node and link positions on each simulation tick
-        function ticked() {
-            link.attr("x1", d => d.source.x)
-                .attr("y1", d => d.source.y)
-                .attr("x2", d => d.target.x)
-                .attr("y2", d => d.target.y);
-
-            node.attr("transform", d => `translate(${d.x},${d.y})`);
-        }
-        */
-
         // Apply force simulation to nodes and links
         simulation.nodes(nodes).on("tick", function() {
             link.attr("x1", d => d.source.x)
@@ -181,13 +147,17 @@ function dragged(event, d) {
         }
     }
     adjustChildren(d, dx, dy);
+    console.log(`dx: ${dx}, dy: ${dy}`); // Debugging output
 }
 
 
 function dragended(event, d) {
     if (!event.active) simulation.alphaTarget(0);
-    d.fx = null;
-    d.fy = null;
+    if (!event.sourceEvent.ctrlKey) { // Only keep position fixed if CTRL is held
+        d.fx = null;
+        d.fy = null;
+    }
+    console.log(`fx: ${d.fx}, fy: ${d.fy}`); // Debugging output
 }
 
 /*function dragended(event, d) {

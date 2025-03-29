@@ -1,40 +1,47 @@
 body {
     font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     margin: 0;
+    padding: 0;
     background-color: #f4f4f4;
-}
-
-.container {
     text-align: center;
 }
 
+header {
+    background: #333;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+}
+
 button {
-    padding: 10px 20px;
-    margin-bottom: 20px;
-    font-size: 16px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 15px;
     cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
 }
 
-svg {
-    width: 100vw;
-    height: 80vh;
-    border: 1px solid #ccc;
-    background: white;
+button:hover {
+    background-color: #0056b3;
 }
 
-.node rect {
-    fill: lightblue;
-    stroke: steelblue;
-    rx: 10;
-    ry: 10;
+input[type="range"] {
+    width: 150px;
 }
 
-text {
-    font-size: 14px;
-    text-anchor: middle;
-    pointer-events: none;
+input[type="number"] {
+    width: 60px;
+    text-align: center;
 }

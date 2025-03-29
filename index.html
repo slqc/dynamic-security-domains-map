@@ -3,11 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Security Domain Map</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Graph Controls</title>
+    <link rel="stylesheet" href="styles.css">
     <script src="lib/d3.v7.min.js"></script>
 </head>
 <body>
+    <header>
+        <h1>Graph Controls</h1>
+        <div class="controls">
+            <button id="reset">Reset Graph</button>
+            <label for="forceStrength">Force Strength:</label>
+            <input type="range" id="forceStrength" min="-500" max="0" value="-300">
+            <input type="number" id="forceStrengthValue" min="-500" max="0" value="-300">
+            
+            <label for="linkDistance">Link Distance:</label>
+            <input type="range" id="linkDistance" min="50" max="300" value="150">
+            <input type="number" id="linkDistanceValue" min="50" max="300" value="150">
+        </div>
+    </header>
     <div class="container">
         <button id="reset">Reset Graph</button>
         <svg id="graph"></svg>
@@ -15,3 +28,29 @@
     <script src="map.js"></script>
 </body>
 </html>
+
+<script>
+    function syncInputs(slider, number) {
+        slider.addEventListener('input', () => {
+            number.value = slider.value;
+            updateSimulation();
+        });
+        number.addEventListener('input', () => {
+            slider.value = number.value;
+            updateSimulation();
+        });
+    }
+    
+    function updateSimulation() {
+        const forceStrength = +document.getElementById("forceStrength").value;
+        const linkDistance = +document.getElementById("linkDistance").value;
+        
+        simulation.force("charge", d3.forceManyBody().strength(forceStrength));
+        simulation.force("link", d3.forceLink().id(d => d.id).distance(linkDistance));
+        
+        simulation.alpha(1).restart();
+    }
+    
+    syncInputs(document.getElementById("forceStrength"), document.getElementById("forceStrengthValue"));
+    syncInputs(document.getElementById("linkDistance"), document.getElementById("linkDistanceValue"));
+</script>
