@@ -1,6 +1,9 @@
 const width = window.innerWidth;
-const height = window.innerHeight * 0.8;
+const height = window.innerHeight;// * 0.8;
+var color = d3.scaleOrdinal(d3.schemeCategory10);
 const NODE_MAX_LINE_LENGTH = 20;
+const FORCE_STRENGTH = -100
+const LINK_DISTANCE = 100
 
 // Select the SVG element and set its dimensions
 const svg = d3.select("#graph")
@@ -17,14 +20,23 @@ const g = svg.append("g"); // Create a group for the graph elements
 
 // Initialize the force simulation
 const simulation = d3.forceSimulation()
-    .force("link", d3.forceLink().id(d => d.id).distance(100)) // Define link distance
-    .force("charge", d3.forceManyBody().strength(-50)) // Repel nodes from each other
-    .force("center", d3.forceCenter(width / 2, height / 2)); // Center the graph
+    .force("link", d3.forceLink().id(d => d.id).distance(LINK_DISTANCE).strength(1)) // Define link distance
+    .force("charge", d3.forceManyBody().strength(FORCE_STRENGTH)) // Repel nodes from each other
+    .force("center", d3.forceCenter(width / 1.8, height / 1.8)) // Center the graph
+    //.force("gravity", d3.forceManyBody().strength(-30)) // tweak strength
+    .force("attract", d3.forceRadial(0, width / 2, height / 2).strength(0.02))
     //.force("collision", d3.forceCollide().radius(d => d.width / 2 ).iterations(1))
+    .force("collision", d3.forceCollide().radius(d => d.width / 2 ).iterations(10));
 
 // Function to load and render the graph
 function loadGraph() {
     d3.json("cybersecurity-domains.json").then(data => {
+        const root = d3.hierarchy(data);
+        //root.data.isCentralNode = true;
+        console.log(data);
+        assignColors(root,null);
+        //const nodes = root.descendants();
+        //const links = root.links();
         const nodes = [];
         const links = [];
 
@@ -32,6 +44,13 @@ function loadGraph() {
         function traverse(node, parent = null) {
             node.width = Math.max(100, node.name.length * 5 + 52); // Store width
             node.height = node.name.length > NODE_MAX_LINE_LENGTH ? 50 : 30; // Store height
+
+            if (nodes.length === 0) {
+                node.isCentralNode = true;
+                node.fx = width / 2;
+                node.fy = height / 2;
+            }
+
             nodes.push(node);
             if (parent) links.push({ source: parent, target: node });
             if (node.children) node.children.forEach(child => traverse(child, node));
@@ -69,10 +88,15 @@ function loadGraph() {
             //.attr("width", d => d.name.length * 10 + 20) // Adjust width based on text length
             .attr("width",  d => d.width) // Ensure a minimum width
             .attr("height", d => d.height) // Increase height if split
-            .attr("rx", 10)
-            .attr("ry", 10)
-            .attr("fill", (d, i) => d3.schemeCategory10[i % 10]); // Assign colors to main categories
-
+            .attr("x", 0)//d => -d.width / 2)
+            .attr("y", d => -d.height / 4)
+            .attr("rx", 10)  // Rounded corners
+            .attr("ry", 10)  // Rounded corners
+            .attr("stroke", d => d.color)
+            .attr("stroke-width", 4)
+            .attr("fill", d => d3.color(d.fillColor).brighter(1.5).formatHex())
+            .attr("opacity", 0.8);
+            
         // Append text labels inside nodes
         /*node.append("text")
             .attr("dy", 20)
@@ -111,6 +135,12 @@ function loadGraph() {
 
         // Apply force simulation to nodes and links
         simulation.nodes(nodes).on("tick", function() {
+             //node.attr("cx", d => d.x = Math.max(10, Math.min(width - 10, d.x)))
+             //    .attr("cy", d => d.y = Math.max(10, Math.min(height - 10, d.y)));
+             nodes.forEach(d => {
+                d.x = Math.max(10, Math.min(width - 10, d.x));
+                d.y = Math.max(10, Math.min(height - 10, d.y));
+            });
             link.attr("x1", d => d.source.x)
                 .attr("y1", d => d.source.y)
                 .attr("x2", d => d.target.x)
@@ -120,6 +150,26 @@ function loadGraph() {
         });
 
         simulation.force("link").links(links);      
+
+        function assignColors(node, parentColor) {
+            if (node.depth === 0) {
+                node.data.color = color(node.data.name); // Unique color for root
+                node.data.fillColor = node.data.color;
+                node.data.fillColor.opacity = 0.2;
+            } else if (node.depth === 1) {
+                node.data.color = color(node.data.name); // Unique color for each branch root
+                node.data.fillColor = node.data.color;
+                node.data.fillColor.opacity = 0.2;
+            } else {
+                node.data.color = parentColor; // Subnodes get the parent color
+                node.data.fillColor = node.data.color;
+                node.data.fillColor.opacity = 0.2;
+            }
+            node.children?.forEach(child => {
+                assignColors(child, node.data.color);
+
+            });
+        }
     });
 }
 
@@ -130,6 +180,10 @@ function dragstarted(event, d) {
     d.fy = d.y;
 }
 
+
+// Function to move child nodes along with parent node
+// unfortunately it causes buggy behavior
+/*
 function dragged(event, d) {
     const dx = event.x - d.fx;
     const dy = event.y - d.fy;
@@ -142,44 +196,31 @@ function dragged(event, d) {
             node.children.forEach(child => {
                 child.fx = (child.fx ?? child.x) + dx;
                 child.fy = (child.fy ?? child.y) + dy;
+                //child.fx = Math.max(10, Math.min(width - 10, (child.fx ?? child.x) + dx));
+                //child.fy = Math.max(10, Math.min(height - 10, (child.fy ?? child.y) + dy));
                 adjustChildren(child, dx, dy);
             });
         }
     }
     adjustChildren(d, dx, dy);
     console.log(`dx: ${dx}, dy: ${dy}`); // Debugging output
-}
+}*/
 
+
+function dragged(event, d) {
+    d.fx = event.x;
+    d.fy = event.y;
+}
 
 function dragended(event, d) {
     if (!event.active) simulation.alphaTarget(0);
-    if (!event.sourceEvent.ctrlKey) { // Only keep position fixed if CTRL is held
-        d.fx = null;
-        d.fy = null;
-    }
-    console.log(`fx: ${d.fx}, fy: ${d.fy}`); // Debugging output
-}
-
-/*function dragended(event, d) {
-    if (!event.active) simulation.alphaTarget(0.3).restart();
-
-    function repositionChildren(node) {
-        if (node.children) {
-            node.children.forEach((child, index) => {
-                // Apply a small force to spread children apart
-                const angle = (index / node.children.length) * 2 * Math.PI; // Distribute in a circular pattern
-                const distance = 50 + Math.random() * 50; // Random offset to avoid clustering
-
-                child.fx = node.fx + Math.cos(angle) * distance;
-                child.fy = node.fy + Math.sin(angle) * distance;
-
-                repositionChildren(child); // Apply recursively to deeper levels
-            });
+    if (!event.sourceEvent.shiftKey) { // Only keep position fixed if CTRL is held
+        if (!d.isCentralNode) {
+            d.fx = null;
+            d.fy = null;
         }
     }
-
-    repositionChildren(d); // Start repositioning from dragged node
-}*/
+}
 
 // Reset button functionality - clears the graph and reloads it
 document.getElementById("reset").addEventListener("click", () => {
