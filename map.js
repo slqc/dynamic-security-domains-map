@@ -4,6 +4,8 @@ var color = d3.scaleOrdinal(d3.schemeCategory10);
 const NODE_MAX_LINE_LENGTH = 20;
 const FORCE_STRENGTH = -100
 const LINK_DISTANCE = 100
+let nodes = [];
+let links = [];
 
 // Select the SVG element and set its dimensions
 const svg = d3.select("#graph")
@@ -32,13 +34,12 @@ const simulation = d3.forceSimulation()
 function loadGraph() {
     d3.json("cybersecurity-domains.json").then(data => {
         const root = d3.hierarchy(data);
-        //root.data.isCentralNode = true;
         console.log(data);
         assignColors(root,null);
         //const nodes = root.descendants();
         //const links = root.links();
-        const nodes = [];
-        const links = [];
+        nodes = [];
+        links = [];
 
         // Recursively traverse the JSON to extract nodes and links
         function traverse(node, parent = null) {
@@ -52,7 +53,9 @@ function loadGraph() {
             }
 
             nodes.push(node);
-            if (parent) links.push({ source: parent, target: node });
+            if (parent) {
+                links.push({ source: parent, target: node });
+            }
             if (node.children) node.children.forEach(child => traverse(child, node));
         }
         traverse(data);
@@ -173,44 +176,76 @@ function loadGraph() {
     });
 }
 
+/*
 // Drag event functions
 function dragstarted(event, d) {
     if (!event.active) simulation.alphaTarget(0.3).restart();
     d.fx = d.x;
     d.fy = d.y;
+}*/
+
+function dragstarted(event, d) {
+    if (!event.active) simulation.alphaTarget(0.3).restart();
+
+    if (event.sourceEvent.shiftKey) {
+        // Fix the node's position if Shift is held or central node
+        d.fx = d.x;
+        d.fy = d.y;
+    } else {
+
+        // Unfix the node itself if needed (you can remove this if it's fixed elsewhere)
+        d.fx = null;
+        d.fy = null;
+
+        // Recursively unfix all children
+        function unfixChildren(node) {
+            if (node.children) {
+                node.children.forEach(child => {
+                    child.fx = null;
+                    child.fy = null;
+                    unfixChildren(child); // Recursively unfix children
+                });
+            }
+        }
+        unfixChildren(d); // Unfix all children starting from the current node
+    } 
 }
 
 
 // Function to move child nodes along with parent node
 // unfortunately it causes buggy behavior
+
+function dragged(event, d) {
+    if (event.sourceEvent.shiftKey) {
+        const dx = event.x - d.fx;
+        const dy = event.y - d.fy;
+        
+        d.fx = event.x;
+        d.fy = event.y;
+        
+        function adjustChildren(node, dx, dy) {
+            if (node.children) {
+                node.children.forEach(child => {
+                    child.fx = (child.fx ?? child.x) + dx;
+                    child.fy = (child.fy ?? child.y) + dy;
+                    //child.fx = Math.max(10, Math.min(width - 10, (child.fx ?? child.x) + dx));
+                    //child.fy = Math.max(10, Math.min(height - 10, (child.fy ?? child.y) + dy));
+                    adjustChildren(child, dx, dy);
+                });
+            }
+        }
+        adjustChildren(d, dx, dy);
+    } else {
+        d.fx = event.x;
+        d.fy = event.y;
+    }
+}
+
 /*
 function dragged(event, d) {
-    const dx = event.x - d.fx;
-    const dy = event.y - d.fy;
-    
     d.fx = event.x;
     d.fy = event.y;
-    
-    function adjustChildren(node, dx, dy) {
-        if (node.children) {
-            node.children.forEach(child => {
-                child.fx = (child.fx ?? child.x) + dx;
-                child.fy = (child.fy ?? child.y) + dy;
-                //child.fx = Math.max(10, Math.min(width - 10, (child.fx ?? child.x) + dx));
-                //child.fy = Math.max(10, Math.min(height - 10, (child.fy ?? child.y) + dy));
-                adjustChildren(child, dx, dy);
-            });
-        }
-    }
-    adjustChildren(d, dx, dy);
-    console.log(`dx: ${dx}, dy: ${dy}`); // Debugging output
 }*/
-
-
-function dragged(event, d) {
-    d.fx = event.x;
-    d.fy = event.y;
-}
 
 function dragended(event, d) {
     if (!event.active) simulation.alphaTarget(0);
@@ -222,11 +257,56 @@ function dragended(event, d) {
     }
 }
 
-// Reset button functionality - clears the graph and reloads it
 document.getElementById("reset").addEventListener("click", () => {
-    g.selectAll("*").remove(); // Remove existing elements
-    loadGraph(); // Reload the graph with new randomized parameters
+    // Clear the current graph elements
+    g.selectAll("*").remove();
+
+    // Reload the graph with the current structure
+    loadGraph();
+
+    // Slightly adjust the node positions to "shake them up"
+    adjustNodePositions();
+
+    // Apply force simulation with a weaker force to reduce overlap
+    applyWeakenedForces();
+
+    // After a delay, tighten the forces back to their original strength
+    setTimeout(() => {
+        applyTightenedForces();
+    }, 1000); // Delay before re-strengthening the forces
 });
 
+// Adjust node positions slightly (shake them up without randomizing entirely)
+function adjustNodePositions() {
+    const shakeAmount = 30; // Amount by which to "shake" nodes
+
+    nodes.forEach(d => {
+        // Apply a small random shake to each node's x and y position
+        const shakeX = (Math.random() - 0.5) * shakeAmount;
+        const shakeY = (Math.random() - 0.5) * shakeAmount;
+
+        // Apply the shake while keeping within the screen boundaries
+        d.x += shakeX;
+        d.y += shakeY;
+
+        // Optionally, reset the fixed positions (if any)
+        d.fx = null;
+        d.fy = null;
+    });
+}
+
+// Weaken the forces to spread the nodes apart and reduce overlap
+function applyWeakenedForces() {
+    simulation.force("charge").strength(-30); // Weaken charge force
+    simulation.force("link").strength(0.05);  // Weaken link force to reduce attraction between nodes
+    simulation.alpha(1).restart(); // Restart the simulation with these weaker forces
+}
+
+// Tighten the forces back to normal to bring the graph back together
+function applyTightenedForces() {
+    simulation.force("charge").strength(-100); // Restore stronger charge force
+    simulation.force("link").strength(1); // Restore normal link force to attract nodes together
+    simulation.alpha(1).restart(); // Restart the simulation with normal forces
+}
 // Load the graph on page load
 loadGraph();
