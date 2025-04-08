@@ -18,7 +18,7 @@
                             "description": "specialized knowledge how to secure wide area networks, e.g. routing & secure DNS"
                         },
                         {
-                            "name": "Firewalls and \\n Network Security Appliances",
+                            "name": "Firewalls and Network Security Appliances",
                             "description": "Setup and secure configuration of firewalls and other network security appliances"
                         }
                     ]
@@ -103,7 +103,7 @@
                     "name": "Table-top"
                 },
                 {
-                    "name": "Blue/Red Team exercises"
+                    "name": "Blue / Red Team exercises"
                 }
             ]
         },
@@ -197,7 +197,7 @@
                     "description": "",
                     "children": [
                         {
-                            "name": "Infrastructure/Networks"
+                            "name": "Infrastructure / Networks"
                         },
                         {
                             "name": "Applications"
@@ -211,7 +211,7 @@
                     "name": "Vulnerability Scans"
                 },
                 {
-                    "name": "Assessment/Supervision",
+                    "name": "Assessment / Supervision",
                     "description": "",
                     "children": [
                         {

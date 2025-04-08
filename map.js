@@ -25,14 +25,12 @@ const simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(d => d.id).distance(LINK_DISTANCE).strength(1)) // Define link distance
     .force("charge", d3.forceManyBody().strength(FORCE_STRENGTH)) // Repel nodes from each other
     .force("center", d3.forceCenter(width / 1.8, height / 1.8)) // Center the graph
-    //.force("gravity", d3.forceManyBody().strength(-30)) // tweak strength
     .force("attract", d3.forceRadial(0, width / 2, height / 2).strength(0.02))
-    //.force("collision", d3.forceCollide().radius(d => d.width / 2 ).iterations(1))
     .force("collision", d3.forceCollide().radius(d => d.width / 2 ).iterations(10));
 
 // Function to load and render the graph
 function loadGraph() {
-    d3.json("cybersecurity-domains.json").then(data => {
+    d3.json("data/cybersecurity-domains.json").then(data => {
         const root = d3.hierarchy(data);
         console.log(data);
         assignColors(root,null);
@@ -43,8 +41,15 @@ function loadGraph() {
 
         // Recursively traverse the JSON to extract nodes and links
         function traverse(node, parent = null) {
-            node.width = Math.max(100, node.name.length * 5 + 52); // Store width
+            // calculating width & height based on text length and split 
+            // should be moved after the actual text splitting and use the font size as input for a more stable approach
             node.height = node.name.length > NODE_MAX_LINE_LENGTH ? 50 : 30; // Store height
+            if (node.name.length > NODE_MAX_LINE_LENGTH) {
+                node.width = Math.max(100, node.name.length/2 * 9 + 100); // Store width
+            } else {
+                node.width = Math.max(100, node.name.length * 8 + 50); // Store width 
+            }
+
 
             if (nodes.length === 0) {
                 node.isCentralNode = true;
@@ -108,7 +113,8 @@ function loadGraph() {
 
         node.each(function(d) {
             const textGroup = d3.select(this); // Select current node group
-            const lineSpacing = 14; // Spacing for multi-line text
+            const lineSpacing = 20; // Spacing for multi-line text
+            const topMargin = 3;
 
             if (d.name.length > NODE_MAX_LINE_LENGTH) { // If the text is too long, split it
                 const words = d.name.split(" "); // Split by spaces
@@ -117,13 +123,13 @@ function loadGraph() {
                 const secondLine = words.slice(mid).join(" ");
 
                 textGroup.append("text")
-                    .attr("dy", d.height / 2 - lineSpacing)
+                    .attr("dy", d.height / 2 - lineSpacing + topMargin)
                     .attr("dx", d.width / 2)
                     .attr("text-anchor", "middle")
                     .text(firstLine);
 
                 textGroup.append("text")
-                    .attr("dy", d.height / 2)
+                    .attr("dy", d.height / 2 + topMargin)
                     .attr("dx", d.width / 2)
                     .attr("text-anchor", "middle")
                     .text(secondLine);
