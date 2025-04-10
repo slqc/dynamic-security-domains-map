@@ -1,4 +1,6 @@
 # Dynamic cybersecurity domain map
+watch it in action here:
+https://stl-tec.de/dynamic-map/
 
 ![2025-04-08 21_29_31-Leap-01 - VMware Workstation](https://github.com/user-attachments/assets/4b594494-4aca-4125-9653-921b2b749936)
 
