@@ -5,7 +5,7 @@
 - But what it is?
   - Bubbles with custom text that will try to organize themselves without overlap (but will need a little bit of user interaction to truly get there). They can be drawn into cool looking maps with a flew mouse clicks, moved and zoomed and everything..  
 
-Watch it in action <a href="https://stl-tec.de/dynamic-map/" target="_blank">here!</a>  (maybe check below in "how to use" first)
+Use it in action <a href="https://stl-tec.de/dynamic-map/" target="_blank">here!</a>  (maybe check below in "how to use" first)
 
 ![2025-04-08 21_29_31-Leap-01 - VMware Workstation](https://github.com/user-attachments/assets/4b594494-4aca-4125-9653-921b2b749936)
 
