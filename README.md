@@ -1,7 +1,7 @@
 # Dynamic domain map
 
 - What is it?
-  - A dynamic map showing how topics in a domain/field are structured, based on a easily editable json file
+  - A dynamic map showing how topics in a domain/field are structured, based on an easily editable json file
 - But what it is?
   - Bubbles with custom text that will try to organize themselves without overlap (but will need a little bit of user interaction to truly get there). They can be drawn into cool looking maps with a flew mouse clicks, moved and zoomed and everything..  
 
