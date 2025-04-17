@@ -1,3 +1,5 @@
+// Variables block
+
 const width = window.innerWidth;
 const height = window.innerHeight;// * 0.8;
 var color = d3.scaleOrdinal(d3.schemeCategory10);
@@ -6,6 +8,11 @@ const FORCE_STRENGTH = -100
 const LINK_DISTANCE = 100
 let nodes = [];
 let links = [];
+
+const dropdown = document.createElement('select');
+dropdown.id = 'datasetDropdown';
+dropdown.style.margin = '1em';
+document.body.insertBefore(dropdown, document.body.firstChild);
 
 // Select the SVG element and set its dimensions
 const svg = d3.select("#graph")
@@ -28,9 +35,21 @@ const simulation = d3.forceSimulation()
     .force("attract", d3.forceRadial(0, width / 2, height / 2).strength(0.02))
     .force("collision", d3.forceCollide().radius(d => d.width / 2 ).iterations(10));
 
+// Variables block end
+
+// Function definitions:
+
+/*
+refactor option:
+d3.json(jsonPath).then(function(graph) {
+    d3.select("svg").selectAll("*").remove();
+    renderGraph(graph); // if you've separated it
+}.. */
+
 // Function to load and render the graph
-function loadGraph() {
-    d3.json("data/cybersecurity-domains.json").then(data => {
+function loadGraph(jsonPath) {
+    d3.json(jsonPath).then(data => {
+        //d3.select("svg").selectAll("*").remove();
         const root = d3.hierarchy(data);
         console.log(data);
         assignColors(root,null);
@@ -314,5 +333,27 @@ function applyTightenedForces() {
     simulation.force("link").strength(1); // Restore normal link force to attract nodes together
     simulation.alpha(1).restart(); // Restart the simulation with normal forces
 }
+
+// Execution begins here:
+
+fetch('data/index.json')
+  .then(response => response.json())
+  .then(fileList => {
+    fileList.forEach(filename => {
+      const option = document.createElement('option');
+      option.value = filename;
+      option.textContent = filename;
+      dropdown.appendChild(option);
+    });
+
+    // Load the first dataset by default
+    loadGraph('data/' + fileList[0]);
+
+    // Handle dropdown selection
+    dropdown.addEventListener('change', function () {
+      loadGraph('data/' + this.value);
+    });
+  });
+
 // Load the graph on page load
-loadGraph();
+//loadGraph();

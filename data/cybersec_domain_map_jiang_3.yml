@@ -1,0 +1,73 @@
+name: Cybersecurity Domains
+children:
+  - name: Security Architecture
+    children:
+    - name: Security Engineering
+    - name: Access Control
+      children:
+      - name: Federated Identiy
+      - name: MFA & SSO
+      - name: Identify Management
+        children:
+        - name: Privileged Access Management
+        - name: Idenity & Access Management
+      - name: Cloud Security
+      - name: Container Security
+      - name: Endpoint Hygiene
+      - name: Data Protection
+        children:
+        - name: Data Leakage Prevention
+      - name: Network Design
+        children: 
+        - name: DDos Prevention
+      - name: Secure System Build
+        children:
+        - name: Patch Management
+        - name: Baseline Configuration
+      - name: Cryptography
+        children:
+        - name: Certificate Management
+        - name: Encryption Standards
+        - name: Key and Secret Management
+          children:
+          - name: Vaulting
+          - name: HSM
+  - name: Frameworks and Standards
+    children:
+    - name: NIST Cybersecurity Framework
+    - name: CIS Top 20 Controls, CIS Benchmarks
+    - name: ISO 27001, 27017. 27018
+    - name: OWASP Top 10 (WebApp & API)
+    - name: Mitre ATT&CK Framework
+  - name: Application Security
+    children: 
+    - name: S-SDLC
+      children:
+      - name: "Shift Left"
+      children:
+        - name: CI/CD Integration
+    - name: Security UX
+    - name: Security QA
+    - name: API Security
+    - name: Source Code Scan
+      children:
+      - name: SAST
+      - name: Open Source Scam
+    - name: Data-Flow Diagram
+  - name: Risk Assessment
+    children:
+  - name: Enterprise Risk Management
+    children:
+  - name: Governance
+    children:
+  - name: Threat Intelligence
+    children:
+  - name: User Education
+    children:
+  - name: Security Operations
+    children:
+  - name: Physical Security
+    children:
+  - name: Career Development
+    children:
+
