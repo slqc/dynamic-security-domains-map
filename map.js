@@ -2,12 +2,34 @@
 
 const width = window.innerWidth;
 const height = window.innerHeight;// * 0.8;
-var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+//var color = d3.scaleOrdinal(d3.schemePaired);
+
+/*const color = d3.scaleOrdinal().range([
+    "#8A59FF", "#FF515A", "#FFE059", "#93FF47", "#00FFB2", "#60CAFF", "#3632FF", "#D16500", "#CEA78E", "#9ECC9B", "#9E20CC", "#CC7090"
+    ]);
+*/
+
+//d3.scaleOrdinal() .range("...")
+const customColors = [
+  "#1f77b4", "#aec7e8",
+  "#ff7f0e", "#ffbb78",
+  "#2ca02c", "#98df8a",
+  "#d62728", "#ff9896",
+  "#9467bd", "#c5b0d5",
+  "#8c564b", "#c49c94",
+  "#e377c2", "#f7b6d2",
+  "#00FFB2", "#60CAFF",
+  "#bcbd22", "#dbdb8d",
+  "#17becf", "#9edae5"
+]
+
 const NODE_MAX_LINE_LENGTH = 20;
 const FORCE_STRENGTH = -100
 const LINK_DISTANCE = 100
 let nodes = [];
 let links = [];
+let current_json = "";
 
 const dropdown = document.createElement('select');
 dropdown.id = 'datasetDropdown';
@@ -49,7 +71,6 @@ d3.json(jsonPath).then(function(graph) {
 // Function to load and render the graph
 function loadGraph(jsonPath) {
     d3.json(jsonPath).then(data => {
-        //d3.select("svg").selectAll("*").remove();
         const root = d3.hierarchy(data);
         console.log(data);
         assignColors(root,null);
@@ -80,6 +101,8 @@ function loadGraph(jsonPath) {
             if (parent) {
                 links.push({ source: parent, target: node });
             }
+            // if json is bad it will typically fail here
+            // console.log(node.children);
             if (node.children) node.children.forEach(child => traverse(child, node));
         }
         traverse(data);
@@ -119,9 +142,9 @@ function loadGraph(jsonPath) {
             .attr("y", d => -d.height / 4)
             .attr("rx", 10)  // Rounded corners
             .attr("ry", 10)  // Rounded corners
-            .attr("stroke", d => d.color)
-            .attr("stroke-width", 4)
-            .attr("fill", d => d3.color(d.fillColor).brighter(1.5).formatHex())
+            .attr("stroke", d => d3.color(d.fillColor).darker(1.5).formatHex())
+            .attr("stroke-width", 3)
+            .attr("fill", d => d3.color(d.fillColor).brighter(0).formatHex())
             .attr("opacity", 0.8);
             
         // Append text labels inside nodes
@@ -179,24 +202,40 @@ function loadGraph(jsonPath) {
 
         simulation.force("link").links(links);      
 
+        function shuffle(array) {
+          const result = [...array];
+          for (let i = result.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [result[i], result[j]] = [result[j], result[i]];
+          }
+          return result;
+        }
+
         function assignColors(node, parentColor) {
+            const shuffledColors = shuffle([...customColors]);
+            //const names = nodes.map(d => d.name);
+            //const color = d3.scaleOrdinal().domain(names).range(shuffledColors);
+            var i=0;
             if (node.depth === 0) {
-                node.data.color = color(node.data.name); // Unique color for root
+                //node.data.color = color(node.data.name); // Unique color for root
+                node.data.color = shuffledColors[i++]; // Unique color for root
                 node.data.fillColor = node.data.color;
-                node.data.fillColor.opacity = 0.2;
+                //node.data.fillColor.opacity = 0.9;
             } else if (node.depth === 1) {
-                node.data.color = color(node.data.name); // Unique color for each branch root
+                // bug: for some reason using the name results in duplicate colors
+                //node.data.color = color(node.data.name); // Unique color for each branch root
+                node.data.color = shuffledColors[i++];
+                //node.data.color = color(Math.random().toString(36).substring(2, 7)); //-> random color option
                 node.data.fillColor = node.data.color;
-                node.data.fillColor.opacity = 0.2;
+                //node.data.fillColor.opacity = 0.9;
             } else {
                 node.data.color = parentColor; // Subnodes get the parent color
                 node.data.fillColor = node.data.color;
-                node.data.fillColor.opacity = 0.2;
+                //node.data.fillColor.opacity = 0.8;
             }
             node.children?.forEach(child => {
                 assignColors(child, node.data.color);
-
-            });
+                });
         }
     });
 }
@@ -287,7 +326,7 @@ document.getElementById("reset").addEventListener("click", () => {
     g.selectAll("*").remove();
 
     // Reload the graph with the current structure
-    loadGraph();
+    loadGraph(current_json);
 
     // Slightly adjust the node positions to "shake them up"
     adjustNodePositions();
@@ -346,12 +385,16 @@ fetch('data/index.json')
       dropdown.appendChild(option);
     });
 
+    current_json = 'data/' + fileList[0]
     // Load the first dataset by default
-    loadGraph('data/' + fileList[0]);
+    loadGraph(current_json);
 
     // Handle dropdown selection
     dropdown.addEventListener('change', function () {
-      loadGraph('data/' + this.value);
+      //console.log(this.value);
+      g.selectAll("*").remove();
+      current_json = 'data/' + this.value
+      loadGraph(current_json);
     });
   });
 

@@ -44,8 +44,8 @@ children:
     - name: S-SDLC
       children:
       - name: "Shift Left"
-      children:
-        - name: CI/CD Integration
+        children:
+          - name: CI/CD Integration
     - name: Security UX
     - name: Security QA
     - name: API Security
@@ -56,18 +56,104 @@ children:
     - name: Data-Flow Diagram
   - name: Risk Assessment
     children:
+    - name: Vulnerability Scan
+    - name: Asset Inventory
+    - name: 3rd Party Risk
+      children:
+      - name: 4th Party Risk
+    - name: Penetration test
+      children:
+        - name: Infrastructure (Network and Systems)
+        - name: Social Engineering
+        - name: DAST
+        - name: Application Pen Tests
+    - name: Risk Monitoring Services
   - name: Enterprise Risk Management
     children:
+    - name: Risk Treatment Actions
+    - name: Risk Acceptance Statement
+    - name: Cyber Insurance
+    - name: Lines of Defence
+      children:
+        - name: 1. Process Owners
+        - name: 2. Risk Mgmt Group
+        - name: 3.Audit
+          children:
+            - name: SOC1/SOC2
+    - name: Risk Register
+    - name: Risk Appetite
+    - name: Crisis Management
+    - name: BCP/dR
   - name: Governance
     children:
+    - name: Laws and Regulations
+      children: 
+        - name: Industry Specifc
+          children:
+            - name: PCI
+            - name: HIPAA
+        - name: Central Government
+          children:
+            - name: GDPR
+            - name: GLBA
+        - name: Regional
+          children:
+            - name: CCPA
+            - name: NYS-DFS 23 NYCRR 500
+    - name: Executive Management Involvement
+      children:
+        - name: Risk Informed
+        - name: Reports and Scorecards
+          children:
+            - name: KPIs/KRIs
+    - name: Company's Written Policies
+      children:
+        - name: Policy
+        - name: Procedure
+        - name: Standard
+        - name: Compliance & Enforcement
+        - name: Guideline
   - name: Threat Intelligence
     children:
+      - name: External
+      - name: Contextual
+      - name: Internal
+      - name: IOCs
+      - name: Intel. Sharing
   - name: User Education
     children:
+      - name: Training (new skills)
+      - name: Awareness (reinforcement)
+      - name: Cyber security table-top exercise
   - name: Security Operations
     children:
+      - name: Vulnerability Management
+      - name: Threat Hunting
+      - name: SIEM
+        children:
+          - name: SOAR
+      - name: Security Operations Centers
+      - name: Incident Response
+        children:
+          - name: Breach Notification
+          - name: Containment
+          - name: Eradication
+          - name: Blue Tream
+          - name: Red Team
+          - name: Investigation
+            children:
+              - name: Forensics
+      - name: Active Defense
   - name: Physical Security
     children:
+      - name: IOT Security
   - name: Career Development
-    children:
+    children: 
+    - name: Certification
+    - name: Conferences
+    - name: Training
+    - name: Coaches and Role Models    
+    - name: Peer Groups
+    - name: Self Study
+
 
