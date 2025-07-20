@@ -10,8 +10,22 @@
 </head>
 <body>
     <div id="header-container">
-        <button id="reset"><i class="fas fa-sync-alt"></i> Reset Graph</button>
+        <div class="controls-left">
+            <button id="reset" class="btn btn-primary">
+                <i class="fas fa-sync-alt"></i> Reset Graph
+            </button>
+            <select id="datasetDropdown">
+                <!-- Options will be populated by JavaScript -->
+            </select>
+        </div>
+        
         <h1>Dynamic Cyber Security Domain Map</h1>
+        
+        <div class="controls-right">
+            <button id="fit-button" class="btn btn-secondary">
+                <i class="fas fa-expand-arrows-alt"></i> Fit Screen
+            </button>
+        </div>
     </div>
     
     <div class="graph-container">

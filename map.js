@@ -16,20 +16,16 @@ const customColors = [
 ]
 
 const NODE_MAX_LINE_LENGTH = 20;
-const FORCE_STRENGTH = -100;
-const LINK_DISTANCE = 100;
+const FORCE_STRENGTH = -80;  // Reduced from -100 for tighter layout
+const LINK_DISTANCE = 80;   // Reduced from 100 for closer nodes
 let nodes = [];
 let links = [];
 let current_json = "";
 
-// Create UI elements
-const dropdown = document.createElement('select');
-dropdown.id = 'datasetDropdown';
-
-const fitButton = document.createElement('button');
-fitButton.className = 'btn btn-secondary';
-fitButton.innerHTML = '<i class="fas fa-expand-arrows-alt"></i> Fit Screen';
-fitButton.id = 'fit-button';
+// Get references to existing HTML elements
+const dropdown = document.getElementById('datasetDropdown');
+const fitButton = document.getElementById('fit-button');
+const resetButton = document.getElementById('reset');
 
 // Select the SVG element and set its dimensions
 const svg = d3.select("#graph")
@@ -38,6 +34,9 @@ const svg = d3.select("#graph")
 
 // Store current transform for boundary calculations
 let currentTransform = d3.zoomIdentity;
+
+// Set initial zoom level (0.7 = 70% of normal size)
+const initialZoom = d3.zoomIdentity.scale(0.8);
 
 // Create zoom behavior with proper extent handling
 const zoom = d3.zoom()
@@ -73,12 +72,12 @@ function loadGraph(jsonPath) {
 
         // Recursively traverse the JSON to extract nodes and links
         function traverse(node, parent = null) {
-            // calculating width & height based on text length and split 
-            node.height = node.name.length > NODE_MAX_LINE_LENGTH ? 50 : 30;
+            // Reduced sizing for better fit
+            node.height = node.name.length > NODE_MAX_LINE_LENGTH ? 40 : 25; // Reduced from 50:30
             if (node.name.length > NODE_MAX_LINE_LENGTH) {
-                node.width = Math.max(100, node.name.length/2 * 9 + 100);
+                node.width = Math.max(80, node.name.length/2 * 7 + 80); // Reduced multipliers
             } else {
-                node.width = Math.max(100, node.name.length * 8 + 50);
+                node.width = Math.max(80, node.name.length * 6 + 40); // Reduced multipliers
             }
 
             if (nodes.length === 0) {
@@ -191,6 +190,9 @@ function loadGraph(jsonPath) {
         
         // Restart the simulation
         simulation.alpha(1).restart();
+        
+        // Apply initial zoom level when graph first loads
+        svg.call(zoom.transform, initialZoom);
 
         function shuffle(array) {
           const result = [...array];
@@ -201,22 +203,33 @@ function loadGraph(jsonPath) {
           return result;
         }
 
-        function assignColors(node, parentColor) {
+        function assignColors(root) {
             const shuffledColors = shuffle([...customColors]);
-            var i = 0;
-            if (node.depth === 0) {
-                node.data.color = shuffledColors[i++];
-                node.data.fillColor = node.data.color;
-            } else if (node.depth === 1) {
-                node.data.color = shuffledColors[i++];
-                node.data.fillColor = node.data.color;
-            } else {
-                node.data.color = parentColor;
-                node.data.fillColor = node.data.color;
+            let colorIndex = 0;
+            
+            function assignNodeColor(node, parentColor) {
+                if (node.depth === 0) {
+                    // Root node gets first color
+                    node.data.color = shuffledColors[colorIndex++];
+                    node.data.fillColor = node.data.color;
+                } else if (node.depth === 1) {
+                    // Each main branch gets a unique color
+                    node.data.color = shuffledColors[colorIndex % shuffledColors.length];
+                    node.data.fillColor = node.data.color;
+                    colorIndex++;
+                } else {
+                    // Sub-nodes inherit parent's color
+                    node.data.color = parentColor;
+                    node.data.fillColor = node.data.color;
+                }
+                
+                // Recursively assign colors to children
+                node.children?.forEach(child => {
+                    assignNodeColor(child, node.data.color);
+                });
             }
-            node.children?.forEach(child => {
-                assignColors(child, node.data.color);
-            });
+            
+            assignNodeColor(root);
         }
     });
 }
@@ -296,10 +309,10 @@ function resetGraph() {
         d.y = height / 2 + (Math.random() - 0.5) * 100;
     });
 
-    // Reset zoom to initial state
+    // Reset zoom to initial zoom level (not identity)
     svg.transition().duration(750).call(
         zoom.transform,
-        d3.zoomIdentity
+        initialZoom
     );
 
     // Restart simulation with strong alpha
@@ -335,37 +348,15 @@ function fitGraphToViewport() {
     svg.transition().duration(750).call(zoom.transform, transform);
 }
 
-// Initialize controls in header
+// Initialize event listeners
 function initializeControls() {
-    const headerContainer = document.getElementById('header-container');
-    const controlsLeft = document.createElement('div');
-    const controlsRight = document.createElement('div');
-    
-    controlsLeft.className = 'controls-left';
-    controlsRight.className = 'controls-right';
-    
-    // Move existing reset button to left controls
-    const existingReset = document.getElementById('reset');
-    if (existingReset) {
-        controlsLeft.appendChild(existingReset);
-    }
-    
-    // Add dropdown to left controls
-    controlsLeft.appendChild(dropdown);
-    
-    // Add fit button to right controls
-    controlsRight.appendChild(fitButton);
-    
-    // Insert control groups into header
-    const heading = headerContainer.querySelector('h1');
-    headerContainer.insertBefore(controlsLeft, heading);
-    headerContainer.appendChild(controlsRight);
-    
-    // Add event listeners
-    if (existingReset) {
-        existingReset.addEventListener('click', resetGraph);
-    }
+    // Add event listeners to existing HTML elements
+    resetButton.addEventListener('click', resetGraph);
     fitButton.addEventListener('click', fitGraphToViewport);
+    dropdown.addEventListener('change', function () {
+        current_json = 'data/' + this.value;
+        loadGraph(current_json);
+    });
 }
 
 // Execution begins here:
@@ -375,6 +366,7 @@ fetch('data/index.json')
     // Initialize controls first
     initializeControls();
     
+    // Populate dropdown with options
     fileList.forEach(filename => {
       const option = document.createElement('option');
       option.value = filename;
@@ -382,11 +374,7 @@ fetch('data/index.json')
       dropdown.appendChild(option);
     });
 
+    // Load first dataset
     current_json = 'data/' + fileList[0];
     loadGraph(current_json);
-
-    dropdown.addEventListener('change', function () {
-      current_json = 'data/' + this.value;
-      loadGraph(current_json);
-    });
   });
