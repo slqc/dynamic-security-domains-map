@@ -1,84 +1,195 @@
 /* Global styles */
-body {
-    font-family: 'Poppins', sans-serif;
+* {
     margin: 0;
     padding: 0;
-    background-color: #f9f9f9; /* Light background */
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    height: 100vh;
+    overflow: hidden;
+    color: #333;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+}
+
+/* Header container */
+#header-container {
+    display: flex;
     align-items: center;
-    height: 100vh; /* Full viewport height */
-    overflow: hidden;
+    justify-content: space-between;
+    padding: 15px 25px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
 }
 
-/* Reset button placed on the far left */
-#reset {
-    position: absolute;
-    left: 20px; /* Adjust this value as needed */
-    top: 20px;
-    padding: 12px 24px;
-    font-size: 18px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+/* Left controls group */
+.controls-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
-#reset:hover {
-    background-color: #45a049;
+/* Right controls group */
+.controls-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 /* Heading */
 h1 {
-    font-size: 36px;
-    color: #333;
-    margin: 20px 0; /* Add some margin for spacing */
+    font-size: 28px;
     font-weight: 600;
+    color: #2c3e50;
+    text-align: center;
+    flex-grow: 1;
+    margin: 0 20px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Header container with button and heading */
-#header-container {
-    display: flex; /* Align items horizontally */
-    align-items: center; /* Center vertically */
-    margin: 20px;
-}
-
-/* Container for the graph */
-#graph-container {
-    width: 100%;
-    flex-grow: 1; /* Takes the remaining space */
-    display: flex;
-    justify-content: center;
+/* Button base styles */
+.btn {
+    display: inline-flex;
     align-items: center;
-    overflow: hidden;
+    gap: 8px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* SVG for the graph */
-#graph {
-    width: 100%;
-    height: 100%; /* Take up 100% of the container height */
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
-    font-size: 18px;
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* Reset button */
+.btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Button variants */
+.btn-primary {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+}
+
+.btn-accent {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+}
+
+/* Legacy support for existing reset button */
 #reset {
-    padding: 12px 24px;
-    font-size: 18px;
-    background-color: #4CAF50;
+    padding: 10px 16px;
+    font-size: 14px;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 20px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 #reset:hover {
-    background-color: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, #45a049, #3d8b40);
+}
+
+/* Dropdown styles */
+#datasetDropdown {
+    padding: 10px 16px;
+    font-size: 14px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+}
+
+#datasetDropdown:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 2px 12px rgba(52, 152, 219, 0.3);
+}
+
+/* Graph container */
+.graph-container {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow: hidden;
+}
+
+/* SVG styles */
+#graph {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 12px;
+    box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Icon styles */
+.btn i, #reset i {
+    font-size: 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #header-container {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+    }
+
+    .controls-left,
+    .controls-right {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    h1 {
+        font-size: 24px;
+        margin: 0;
+    }
+
+    .btn, #reset {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+
+    #datasetDropdown {
+        min-width: 150px;
+    }
 }

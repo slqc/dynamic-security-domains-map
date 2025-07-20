@@ -1,16 +1,7 @@
 // Variables block
-
 const width = window.innerWidth;
-const height = window.innerHeight;// * 0.8;
+const height = window.innerHeight - 100; // Account for header height
 
-//var color = d3.scaleOrdinal(d3.schemePaired);
-
-/*const color = d3.scaleOrdinal().range([
-    "#8A59FF", "#FF515A", "#FFE059", "#93FF47", "#00FFB2", "#60CAFF", "#3632FF", "#D16500", "#CEA78E", "#9ECC9B", "#9E20CC", "#CC7090"
-    ]);
-*/
-
-//d3.scaleOrdinal() .range("...")
 const customColors = [
   "#1f77b4", "#aec7e8",
   "#ff7f0e", "#ffbb78",
@@ -25,87 +16,88 @@ const customColors = [
 ]
 
 const NODE_MAX_LINE_LENGTH = 20;
-const FORCE_STRENGTH = -100
-const LINK_DISTANCE = 100
+const FORCE_STRENGTH = -100;
+const LINK_DISTANCE = 100;
 let nodes = [];
 let links = [];
 let current_json = "";
 
+// Create UI elements
 const dropdown = document.createElement('select');
 dropdown.id = 'datasetDropdown';
-dropdown.style.margin = '1em';
-document.body.insertBefore(dropdown, document.body.firstChild);
+
+const fitButton = document.createElement('button');
+fitButton.className = 'btn btn-secondary';
+fitButton.innerHTML = '<i class="fas fa-expand-arrows-alt"></i> Fit Screen';
+fitButton.id = 'fit-button';
 
 // Select the SVG element and set its dimensions
 const svg = d3.select("#graph")
     .attr("width", width)
     .attr("height", height);
 
+// Store current transform for boundary calculations
+let currentTransform = d3.zoomIdentity;
+
+// Create zoom behavior with proper extent handling
+const zoom = d3.zoom()
+    .scaleExtent([0.1, 4])
+    .on("zoom", (event) => {
+        g.attr("transform", event.transform);
+        // Update current transform for boundary calculations
+        currentTransform = event.transform;
+    });
+
+// Add zoom behavior to SVG
+svg.call(zoom);
+
 // Add a zoomable group to the SVG
-d3.select("#graph").call(d3.zoom()
-        .scaleExtent([0.5, 3]) // Set zoom scale limits
-        .on("zoom", (event) => {
-            g.attr("transform", event.transform); // Apply zoom transformations
-        }));
-const g = svg.append("g"); // Create a group for the graph elements
+const g = svg.append("g");
 
-// Initialize the force simulation
+// Initialize the force simulation with better centering
 const simulation = d3.forceSimulation()
-    .force("link", d3.forceLink().id(d => d.id).distance(LINK_DISTANCE).strength(1)) // Define link distance
-    .force("charge", d3.forceManyBody().strength(FORCE_STRENGTH)) // Repel nodes from each other
-    .force("center", d3.forceCenter(width / 1.8, height / 1.8)) // Center the graph
-    .force("attract", d3.forceRadial(0, width / 2, height / 2).strength(0.02))
-    .force("collision", d3.forceCollide().radius(d => d.width / 2 ).iterations(10));
-
-// Variables block end
-
-// Function definitions:
-
-/*
-refactor option:
-d3.json(jsonPath).then(function(graph) {
-    d3.select("svg").selectAll("*").remove();
-    renderGraph(graph); // if you've separated it
-}.. */
+    .force("link", d3.forceLink().id(d => d.id).distance(LINK_DISTANCE).strength(1))
+    .force("charge", d3.forceManyBody().strength(FORCE_STRENGTH))
+    .force("center", d3.forceCenter(width / 2, height / 2)) // Center properly
+    .force("collision", d3.forceCollide().radius(d => d.width / 2).iterations(10));
 
 // Function to load and render the graph
 function loadGraph(jsonPath) {
     d3.json(jsonPath).then(data => {
         const root = d3.hierarchy(data);
         console.log(data);
-        assignColors(root,null);
-        //const nodes = root.descendants();
-        //const links = root.links();
+        assignColors(root, null);
+        
         nodes = [];
         links = [];
 
         // Recursively traverse the JSON to extract nodes and links
         function traverse(node, parent = null) {
             // calculating width & height based on text length and split 
-            // should be moved after the actual text splitting and use the font size as input for a more stable approach
-            node.height = node.name.length > NODE_MAX_LINE_LENGTH ? 50 : 30; // Store height
+            node.height = node.name.length > NODE_MAX_LINE_LENGTH ? 50 : 30;
             if (node.name.length > NODE_MAX_LINE_LENGTH) {
-                node.width = Math.max(100, node.name.length/2 * 9 + 100); // Store width
+                node.width = Math.max(100, node.name.length/2 * 9 + 100);
             } else {
-                node.width = Math.max(100, node.name.length * 8 + 50); // Store width 
+                node.width = Math.max(100, node.name.length * 8 + 50);
             }
-
 
             if (nodes.length === 0) {
                 node.isCentralNode = true;
-                node.fx = width / 2;
-                node.fy = height / 2;
+                // Don't fix the central node position initially
+                // Let the force simulation handle positioning naturally
             }
 
             nodes.push(node);
             if (parent) {
                 links.push({ source: parent, target: node });
             }
-            // if json is bad it will typically fail here
-            // console.log(node.children);
+            
             if (node.children) node.children.forEach(child => traverse(child, node));
         }
         traverse(data);
+
+        // Clear existing elements
+        g.selectAll("*").remove();
 
         // Draw links (lines connecting nodes)
         const link = g.selectAll(".link")
@@ -115,15 +107,6 @@ function loadGraph(jsonPath) {
             .attr("stroke", "#999");
 
         // Draw nodes (groups containing rectangle and text)
-            // select from .node group -> should be empty
-            //  each item in nodes will be used to create an element in the DOM.
-            // .enter() handles new data that has no corresponding DOM element yet. 
-            // .append("g") creates a new <g> (group) element for each node in nodes.
-            // A <g> element acts as a container for multiple child elements (like a rectangle and text).
-            // This allows you to transform the entire node (rectangle and text) as one unit.
-            // Adds the class "node" to each newly created <g> element.
-            // Applies drag behavior to each node.
-
         const node = g.selectAll(".node")
             .data(nodes)
             .enter().append("g")
@@ -135,32 +118,26 @@ function loadGraph(jsonPath) {
 
         // Append rounded rectangles to represent nodes
         node.append("rect")
-            //.attr("width", d => d.name.length * 10 + 20) // Adjust width based on text length
-            .attr("width",  d => d.width) // Ensure a minimum width
-            .attr("height", d => d.height) // Increase height if split
-            .attr("x", 0)//d => -d.width / 2)
+            .attr("width", d => d.width)
+            .attr("height", d => d.height)
+            .attr("x", 0)
             .attr("y", d => -d.height / 4)
-            .attr("rx", 10)  // Rounded corners
-            .attr("ry", 10)  // Rounded corners
+            .attr("rx", 10)
+            .attr("ry", 10)
             .attr("stroke", d => d3.color(d.fillColor).darker(1.5).formatHex())
             .attr("stroke-width", 3)
             .attr("fill", d => d3.color(d.fillColor).brighter(0).formatHex())
             .attr("opacity", 0.8);
             
         // Append text labels inside nodes
-        /*node.append("text")
-            .attr("dy", 20)
-            .attr("dx", d => (d.name.length * 5))
-            .text(d => d.name);*/
-
         node.each(function(d) {
-            const textGroup = d3.select(this); // Select current node group
-            const lineSpacing = 20; // Spacing for multi-line text
+            const textGroup = d3.select(this);
+            const lineSpacing = 20;
             const topMargin = 3;
 
-            if (d.name.length > NODE_MAX_LINE_LENGTH) { // If the text is too long, split it
-                const words = d.name.split(" "); // Split by spaces
-                const mid = Math.ceil(words.length / 2); // Find the middle
+            if (d.name.length > NODE_MAX_LINE_LENGTH) {
+                const words = d.name.split(" ");
+                const mid = Math.ceil(words.length / 2);
                 const firstLine = words.slice(0, mid).join(" ");
                 const secondLine = words.slice(mid).join(" ");
 
@@ -186,12 +163,22 @@ function loadGraph(jsonPath) {
 
         // Apply force simulation to nodes and links
         simulation.nodes(nodes).on("tick", function() {
-             //node.attr("cx", d => d.x = Math.max(10, Math.min(width - 10, d.x)))
-             //    .attr("cy", d => d.y = Math.max(10, Math.min(height - 10, d.y)));
-             nodes.forEach(d => {
-                d.x = Math.max(10, Math.min(width - 10, d.x));
-                d.y = Math.max(10, Math.min(height - 10, d.y));
+            // Apply boundary constraints that respect zoom level
+            nodes.forEach(d => {
+                // Calculate visible boundaries considering current zoom and pan
+                const margin = 50; // Margin from screen edge
+                const visibleLeft = (-currentTransform.x) / currentTransform.k + margin;
+                const visibleRight = (-currentTransform.x + width) / currentTransform.k - margin;
+                const visibleTop = (-currentTransform.y) / currentTransform.k + margin;
+                const visibleBottom = (-currentTransform.y + height) / currentTransform.k - margin;
+                
+                // Constrain nodes to visible area
+                if (d.x < visibleLeft) d.x = visibleLeft;
+                if (d.x > visibleRight) d.x = visibleRight;
+                if (d.y < visibleTop) d.y = visibleTop;
+                if (d.y > visibleBottom) d.y = visibleBottom;
             });
+            
             link.attr("x1", d => d.source.x)
                 .attr("y1", d => d.source.y)
                 .attr("x2", d => d.target.x)
@@ -200,7 +187,10 @@ function loadGraph(jsonPath) {
             node.attr("transform", d => `translate(${d.x - d.width / 2},${d.y - d.height / 2})`);
         });
 
-        simulation.force("link").links(links);      
+        simulation.force("link").links(links);
+        
+        // Restart the simulation
+        simulation.alpha(1).restart();
 
         function shuffle(array) {
           const result = [...array];
@@ -213,71 +203,47 @@ function loadGraph(jsonPath) {
 
         function assignColors(node, parentColor) {
             const shuffledColors = shuffle([...customColors]);
-            //const names = nodes.map(d => d.name);
-            //const color = d3.scaleOrdinal().domain(names).range(shuffledColors);
-            var i=0;
+            var i = 0;
             if (node.depth === 0) {
-                //node.data.color = color(node.data.name); // Unique color for root
-                node.data.color = shuffledColors[i++]; // Unique color for root
-                node.data.fillColor = node.data.color;
-                //node.data.fillColor.opacity = 0.9;
-            } else if (node.depth === 1) {
-                // bug: for some reason using the name results in duplicate colors
-                //node.data.color = color(node.data.name); // Unique color for each branch root
                 node.data.color = shuffledColors[i++];
-                //node.data.color = color(Math.random().toString(36).substring(2, 7)); //-> random color option
                 node.data.fillColor = node.data.color;
-                //node.data.fillColor.opacity = 0.9;
+            } else if (node.depth === 1) {
+                node.data.color = shuffledColors[i++];
+                node.data.fillColor = node.data.color;
             } else {
-                node.data.color = parentColor; // Subnodes get the parent color
+                node.data.color = parentColor;
                 node.data.fillColor = node.data.color;
-                //node.data.fillColor.opacity = 0.8;
             }
             node.children?.forEach(child => {
                 assignColors(child, node.data.color);
-                });
+            });
         }
     });
 }
 
-/*
 // Drag event functions
-function dragstarted(event, d) {
-    if (!event.active) simulation.alphaTarget(0.3).restart();
-    d.fx = d.x;
-    d.fy = d.y;
-}*/
-
 function dragstarted(event, d) {
     if (!event.active) simulation.alphaTarget(0.3).restart();
 
     if (event.sourceEvent.shiftKey) {
-        // Fix the node's position if Shift is held or central node
         d.fx = d.x;
         d.fy = d.y;
     } else {
-
-        // Unfix the node itself if needed (you can remove this if it's fixed elsewhere)
         d.fx = null;
         d.fy = null;
 
-        // Recursively unfix all children
         function unfixChildren(node) {
             if (node.children) {
                 node.children.forEach(child => {
                     child.fx = null;
                     child.fy = null;
-                    unfixChildren(child); // Recursively unfix children
+                    unfixChildren(child);
                 });
             }
         }
-        unfixChildren(d); // Unfix all children starting from the current node
+        unfixChildren(d);
     } 
 }
-
-
-// Function to move child nodes along with parent node
-// unfortunately it causes buggy behavior
 
 function dragged(event, d) {
     if (event.sourceEvent.shiftKey) {
@@ -292,28 +258,27 @@ function dragged(event, d) {
                 node.children.forEach(child => {
                     child.fx = (child.fx ?? child.x) + dx;
                     child.fy = (child.fy ?? child.y) + dy;
-                    //child.fx = Math.max(10, Math.min(width - 10, (child.fx ?? child.x) + dx));
-                    //child.fy = Math.max(10, Math.min(height - 10, (child.fy ?? child.y) + dy));
                     adjustChildren(child, dx, dy);
                 });
             }
         }
         adjustChildren(d, dx, dy);
     } else {
-        d.fx = event.x;
-        d.fy = event.y;
+        // Apply boundary constraints during drag
+        const margin = 50;
+        const visibleLeft = (-currentTransform.x) / currentTransform.k + margin;
+        const visibleRight = (-currentTransform.x + width) / currentTransform.k - margin;
+        const visibleTop = (-currentTransform.y) / currentTransform.k + margin;
+        const visibleBottom = (-currentTransform.y + height) / currentTransform.k - margin;
+        
+        d.fx = Math.max(visibleLeft, Math.min(visibleRight, event.x));
+        d.fy = Math.max(visibleTop, Math.min(visibleBottom, event.y));
     }
 }
 
-/*
-function dragged(event, d) {
-    d.fx = event.x;
-    d.fy = event.y;
-}*/
-
 function dragended(event, d) {
     if (!event.active) simulation.alphaTarget(0);
-    if (!event.sourceEvent.shiftKey) { // Only keep position fixed if CTRL is held
+    if (!event.sourceEvent.shiftKey) {
         if (!d.isCentralNode) {
             d.fx = null;
             d.fy = null;
@@ -321,63 +286,95 @@ function dragended(event, d) {
     }
 }
 
-document.getElementById("reset").addEventListener("click", () => {
-    // Clear the current graph elements
-    g.selectAll("*").remove();
-
-    // Reload the graph with the current structure
-    loadGraph(current_json);
-
-    // Slightly adjust the node positions to "shake them up"
-    adjustNodePositions();
-
-    // Apply force simulation with a weaker force to reduce overlap
-    applyWeakenedForces();
-
-    // After a delay, tighten the forces back to their original strength
-    setTimeout(() => {
-        applyTightenedForces();
-    }, 1000); // Delay before re-strengthening the forces
-});
-
-// Adjust node positions slightly (shake them up without randomizing entirely)
-function adjustNodePositions() {
-    const shakeAmount = 30; // Amount by which to "shake" nodes
-
+// Enhanced reset function
+function resetGraph() {
+    // Reset all node positions and constraints
     nodes.forEach(d => {
-        // Apply a small random shake to each node's x and y position
-        const shakeX = (Math.random() - 0.5) * shakeAmount;
-        const shakeY = (Math.random() - 0.5) * shakeAmount;
-
-        // Apply the shake while keeping within the screen boundaries
-        d.x += shakeX;
-        d.y += shakeY;
-
-        // Optionally, reset the fixed positions (if any)
         d.fx = null;
         d.fy = null;
+        d.x = width / 2 + (Math.random() - 0.5) * 100;
+        d.y = height / 2 + (Math.random() - 0.5) * 100;
     });
+
+    // Reset zoom to initial state
+    svg.transition().duration(750).call(
+        zoom.transform,
+        d3.zoomIdentity
+    );
+
+    // Restart simulation with strong alpha
+    simulation.alpha(1).restart();
 }
 
-// Weaken the forces to spread the nodes apart and reduce overlap
-function applyWeakenedForces() {
-    simulation.force("charge").strength(-30); // Weaken charge force
-    simulation.force("link").strength(0.05);  // Weaken link force to reduce attraction between nodes
-    simulation.alpha(1).restart(); // Restart the simulation with these weaker forces
+// Function to fit graph to viewport
+function fitGraphToViewport() {
+    if (nodes.length === 0) return;
+
+    // Calculate bounding box of all nodes
+    const xExtent = d3.extent(nodes, d => d.x);
+    const yExtent = d3.extent(nodes, d => d.y);
+    
+    const graphWidth = xExtent[1] - xExtent[0];
+    const graphHeight = yExtent[1] - yExtent[0];
+    
+    // Add padding
+    const padding = 50;
+    const scale = Math.min(
+        (width - padding) / graphWidth,
+        (height - padding) / graphHeight
+    );
+    
+    const centerX = (xExtent[0] + xExtent[1]) / 2;
+    const centerY = (yExtent[0] + yExtent[1]) / 2;
+    
+    const transform = d3.zoomIdentity
+        .translate(width / 2, height / 2)
+        .scale(scale)
+        .translate(-centerX, -centerY);
+    
+    svg.transition().duration(750).call(zoom.transform, transform);
 }
 
-// Tighten the forces back to normal to bring the graph back together
-function applyTightenedForces() {
-    simulation.force("charge").strength(-100); // Restore stronger charge force
-    simulation.force("link").strength(1); // Restore normal link force to attract nodes together
-    simulation.alpha(1).restart(); // Restart the simulation with normal forces
+// Initialize controls in header
+function initializeControls() {
+    const headerContainer = document.getElementById('header-container');
+    const controlsLeft = document.createElement('div');
+    const controlsRight = document.createElement('div');
+    
+    controlsLeft.className = 'controls-left';
+    controlsRight.className = 'controls-right';
+    
+    // Move existing reset button to left controls
+    const existingReset = document.getElementById('reset');
+    if (existingReset) {
+        controlsLeft.appendChild(existingReset);
+    }
+    
+    // Add dropdown to left controls
+    controlsLeft.appendChild(dropdown);
+    
+    // Add fit button to right controls
+    controlsRight.appendChild(fitButton);
+    
+    // Insert control groups into header
+    const heading = headerContainer.querySelector('h1');
+    headerContainer.insertBefore(controlsLeft, heading);
+    headerContainer.appendChild(controlsRight);
+    
+    // Add event listeners
+    if (existingReset) {
+        existingReset.addEventListener('click', resetGraph);
+    }
+    fitButton.addEventListener('click', fitGraphToViewport);
 }
 
 // Execution begins here:
-
 fetch('data/index.json')
   .then(response => response.json())
   .then(fileList => {
+    // Initialize controls first
+    initializeControls();
+    
     fileList.forEach(filename => {
       const option = document.createElement('option');
       option.value = filename;
@@ -385,18 +382,11 @@ fetch('data/index.json')
       dropdown.appendChild(option);
     });
 
-    current_json = 'data/' + fileList[0]
-    // Load the first dataset by default
+    current_json = 'data/' + fileList[0];
     loadGraph(current_json);
 
-    // Handle dropdown selection
     dropdown.addEventListener('change', function () {
-      //console.log(this.value);
-      g.selectAll("*").remove();
-      current_json = 'data/' + this.value
+      current_json = 'data/' + this.value;
       loadGraph(current_json);
     });
   });
-
-// Load the graph on page load
-//loadGraph();
