@@ -119,7 +119,7 @@ h1 {
 }
 
 /* Dropdown styles */
-#datasetDropdown {
+#datasetDropdown, #layoutSelect {
     padding: 10px 16px;
     font-size: 14px;
     border: 2px solid #ddd;
@@ -131,10 +131,71 @@ h1 {
     min-width: 180px;
 }
 
-#datasetDropdown:focus {
+#datasetDropdown:focus, #layoutSelect:focus {
     outline: none;
     border-color: #3498db;
     box-shadow: 0 2px 12px rgba(52, 152, 219, 0.3);
+}
+
+/* Zoom control styles */
+.zoom-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.zoom-control label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #2c3e50;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+#zoomSlider {
+    width: 100px;
+    height: 6px;
+    background: #ddd;
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+}
+
+#zoomSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#zoomSlider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#zoomValue {
+    font-size: 12px;
+    color: #666;
+    min-width: 35px;
+    text-align: center;
+    font-weight: 500;
 }
 
 /* Graph container */
@@ -189,7 +250,18 @@ h1 {
         padding: 8px 12px;
     }
 
-    #datasetDropdown {
+    #datasetDropdown, #layoutSelect {
         min-width: 150px;
+    }
+
+    /* Responsive adjustments for zoom control */
+    .zoom-control {
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 6px 8px;
+    }
+    
+    #zoomSlider {
+        width: 80px;
     }
 }

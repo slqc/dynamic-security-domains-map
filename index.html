@@ -17,11 +17,28 @@
             <select id="datasetDropdown">
                 <!-- Options will be populated by JavaScript -->
             </select>
+            <div class="zoom-control">
+                <label for="zoomSlider">
+                    <i class="fas fa-search"></i> Zoom:
+                </label>
+                <input type="range" id="zoomSlider" min="0.1" max="4" step="0.1" value="0.8">
+                <span id="zoomValue">0.8x</span>
+            </div>
         </div>
         
         <h1>Dynamic Cyber Security Domain Map</h1>
         
         <div class="controls-right">
+            <select id="layoutSelect">
+                <option value="organic">Organic Layout</option>
+                <option value="radial">Radial Layout</option>
+                <option value="hierarchical">Hierarchical Layout</option>
+                <option value="cluster">Cluster Layout</option>
+                <option value="spring">Spring Layout</option>
+                <option value="tree">Tree Layout (No Crossings)</option>
+                <option value="fixed">Fixed Positions</option>
+                <option value="enhancedFixed">Enhanced Fixed Positions</option>
+            </select>
             <button id="fit-button" class="btn btn-secondary">
                 <i class="fas fa-expand-arrows-alt"></i> Fit Screen
             </button>
